@@ -6,30 +6,24 @@ use Illuminate\Database\Eloquent\Model;
 
 class ActivityLog extends Model
 {
-    public $timestamps = false;
+    public $timestamps = false; // on utilise performed_at à la place
 
     protected $fillable = [
-        'tenant_id',
-        'application_id',
-        'action',
-        'ip_address',
-        'status',
-        'message',
-        'performed_at',
+        'tenant_id', 'application_id', 'action',
+        'ip_address', 'status', 'message', 'performed_at'
     ];
 
-    protected function casts(): array
-    {
-        return [
-            'performed_at' => 'datetime',
-        ];
-    }
+    protected $casts = [
+        'performed_at' => 'datetime',
+    ];
 
+    // Un log appartient à un tenant
     public function tenant()
     {
         return $this->belongsTo(Tenant::class);
     }
 
+    // Un log appartient à une application
     public function application()
     {
         return $this->belongsTo(Application::class);

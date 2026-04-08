@@ -4,52 +4,51 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ApplicationController;
-use App\Http\Controllers\ApiKeyController;
-use App\Http\Controllers\MasterKeyController;
-use App\Http\Controllers\ActivityController;
-
+use App\Http\Controllers\Api\EncryptionController;   // ← Ajout important
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\MasterKeyController;
+use App\Http\Controllers\Admin\TenantController;
+use App\Http\Controllers\Admin\PlanController;
 
 // Routes publiques
-Route::middleware('guest')->group(function () {
-    Route::get('/register', [RegisterController::class, 'showForm'])->name('register');
-    Route::post('/register', [RegisterController::class, 'register']);
-    Route::get('/login', [LoginController::class, 'showForm'])->name('login');
-    Route::post('/login', [LoginController::class, 'login']);
+Route::get('/', function () {
+    return redirect()->route('login');
 });
+
+// Inscription
+Route::get('/register', [RegisterController::class, 'showForm'])->name('register');
+Route::post('/register', [RegisterController::class, 'register']);
+
+// Connexion
+Route::get('/login', [LoginController::class, 'showForm'])->name('login');
+Route::post('/login', [LoginController::class, 'login']);
+
+// Déconnexion
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Routes protégées
 Route::middleware('auth')->group(function () {
 
-    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+         ->name('dashboard');
 
-    // Applications
-    Route::prefix('applications')->name('applications.')->group(function () {
-        Route::get('/', [ApplicationController::class, 'index'])->name('index');
-        Route::get('/create', [ApplicationController::class, 'create'])->name('create');
-        Route::post('/', [ApplicationController::class, 'store'])->name('store');
-        Route::get('/{application}', [ApplicationController::class, 'show'])->name('show');
-        Route::delete('/{application}', [ApplicationController::class, 'destroy'])->name('destroy');
+    // ==================== ROUTES API ====================
+    Route::prefix('api')->group(function () {
+        Route::post('/encrypt', [EncryptionController::class, 'encrypt']);
+        Route::post('/decrypt', [EncryptionController::class, 'decrypt']);
+        Route::post('/decrypt/plain', [EncryptionController::class, 'decryptPlain']);
     });
-
-    // API Keys
-    Route::prefix('api-keys')->name('apikeys.')->group(function () {
-        Route::post('/generate/{application}', [ApiKeyController::class, 'generate'])->name('generate');
-        Route::patch('/revoke/{apiKey}', [ApiKeyController::class, 'revoke'])->name('revoke');
-    });
-
-    Route::prefix('master-keys')->name('masterkeys.')->group(function () {
-    Route::get('/', [MasterKeyController::class, 'index'])->name('index');
-    Route::post('/rotate', [MasterKeyController::class, 'rotate'])->name('rotate');
 });
 
-
-Route::get('/activity', [ActivityController::class, 'index'])->name('activity.index');
-
-});
-
-// Redirection page d'accueil
-Route::get('/', function () {
-    return redirect()->route('login');
+Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/',         [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/keys',     [MasterKeyController::class, 'index'])->name('keys.index');
+    Route::post('/keys/rotate', [MasterKeyController::class, 'rotate'])->name('keys.rotate');
+    Route::get('/keys/status',  [MasterKeyController::class, 'status'])->name('keys.status');
+    Route::get('/tenants',          [TenantController::class, 'index'])->name('tenants.index');
+    Route::get('/tenants/{tenant}', [TenantController::class, 'show'])->name('tenants.show');
+    Route::post('/tenants/{tenant}/suspend',  [TenantController::class, 'suspend'])->name('tenants.suspend');
+    Route::post('/tenants/{tenant}/activate', [TenantController::class, 'activate'])->name('tenants.activate');
+    Route::get('/plans',              [PlanController::class, 'index'])->name('plans.index');
+    Route::put('/plans/{plan}',       [PlanController::class, 'update'])->name('plans.update');
 });
