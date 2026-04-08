@@ -30,22 +30,25 @@
                 <i class="fa-solid fa-gauge-high w-4"></i>
                 Dashboard
             </a>
-            <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-gray-800 hover:text-white transition">
-                <i class="fa-solid fa-cubes w-4"></i>
-                Applications
-            </a>
+           <a href="{{ route('applications.index') }}" 
+   class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('applications.*') ? 'bg-indigo-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }} transition">
+    <i class="fa-solid fa-cubes w-4"></i>
+    Applications
+</a>
             <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-gray-800 hover:text-white transition">
                 <i class="fa-solid fa-key w-4"></i>
                 Clés API
             </a>
-            <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-gray-800 hover:text-white transition">
-                <i class="fa-solid fa-shield-halved w-4"></i>
-                Master Keys
-            </a>
-            <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-400 hover:bg-gray-800 hover:text-white transition">
-                <i class="fa-solid fa-list-check w-4"></i>
-                Activité
-            </a>
+            <a href="{{ route('masterkeys.index') }}"
+   class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('masterkeys.*') ? 'bg-indigo-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }} transition">
+    <i class="fa-solid fa-shield-halved w-4"></i>
+    Master Keys
+</a>
+            <a href="{{ route('activity.index') }}"
+   class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm {{ request()->routeIs('activity.*') ? 'bg-indigo-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }} transition">
+    <i class="fa-solid fa-list-check w-4"></i>
+    Activité
+</a>
         </nav>
 
         {{-- User + Logout --}}

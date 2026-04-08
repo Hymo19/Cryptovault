@@ -7,6 +7,7 @@ use App\Models\Plan;
 use App\Models\Tenant;
 use App\Models\User;
 use App\Models\Subscription;
+use App\Services\EnvelopeEncryptionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -56,6 +57,10 @@ class RegisterController extends Controller
                 'status'     => 'active',
             ]);
         }
+
+        // Initialiser la Master Key du tenant
+        $encryptionService = new EnvelopeEncryptionService();
+        $encryptionService->initMasterKey($tenant);
 
         Auth::login($user);
 
