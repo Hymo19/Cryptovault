@@ -9,6 +9,9 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\MasterKeyController;
 use App\Http\Controllers\Admin\TenantController;
 use App\Http\Controllers\Admin\PlanController;
+use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\KeyController;
+use App\Http\Controllers\LogController;
 
 // Routes publiques
 Route::get('/', function () {
@@ -22,6 +25,8 @@ Route::post('/register', [RegisterController::class, 'register']);
 // Connexion
 Route::get('/login', [LoginController::class, 'showForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
+
+
 
 // Déconnexion
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
@@ -38,6 +43,26 @@ Route::middleware('auth')->group(function () {
         Route::post('/decrypt', [EncryptionController::class, 'decrypt']);
         Route::post('/decrypt/plain', [EncryptionController::class, 'decryptPlain']);
     });
+
+
+
+    // Applications
+    Route::get('/applications', [ApplicationController::class, 'index'])->name('applications.index');
+    Route::post('/applications', [ApplicationController::class, 'store'])->name('applications.store');
+    Route::delete('/applications/{application}', [ApplicationController::class, 'destroy'])->name('applications.destroy');
+    Route::post('/applications/{application}/suspend', [ApplicationController::class, 'suspend'])->name('applications.suspend');
+    Route::post('/applications/{application}/activate', [ApplicationController::class, 'activate'])->name('applications.activate');
+
+    // API Keys
+    Route::get('/keys', [KeyController::class, 'index'])->name('keys.index');
+    Route::post('/keys', [KeyController::class, 'store'])->name('keys.store');
+    Route::post('/keys/{apiKey}/revoke', [KeyController::class, 'revoke'])->name('keys.revoke');
+
+    // Logs
+    Route::get('/logs', [LogController::class, 'index'])->name('logs.index');
+
+
+
 });
 
 Route::middleware(['auth', 'superadmin'])->prefix('admin')->name('admin.')->group(function () {
